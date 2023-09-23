@@ -3,7 +3,6 @@ using namespace std;
 
 template <class T> struct Node {
     T valor[5];
-    T* toparr = valor+4;
     Node<T>* next;
     Node(T v, Node<T>* n = nullptr) {
         for (T* p=valor;p<valor+5;p++) {
@@ -16,55 +15,57 @@ template <class T> struct Node {
 
 template <class T> class Pila {
 public:
-    Node<T>* top;
-    Pila() { top = NULL; }
+    Node<T>* top=0;
+    T* toparr;
     void push(T v);
-    void pop();
+    T pop();
     void imprimir();
 };
 template <class T> void Pila<T>::imprimir() {
     for (Node<T>* p = top; p; p = p->next) {
+        cout << "{";
         for (T* p2 = p->valor; p2 < p->valor + 5; p2++) {
             cout << *p2 << ",";
         }
+        cout << "}";
     }
 }
 template <class T> void Pila<T>::push(T v) {
     if (!top) {
         Node<T>* newNode = new Node<T>(v, NULL);
         top = newNode;
+        toparr = top->valor;
     }
-    else if (*(top->toparr)==(0)) {
-        int cont = 0;
-        for (T* tmp = top->valor; tmp != top->valor + 5; tmp++) {
-            if (*(tmp) == 0) {
-                *(tmp) = v;
-                break;
-            }
-        }
+    else if (toparr != top->valor+4) {
+        toparr++;
+        *toparr = v;
     }
     else {
         Node<T>* newNode = new Node<T>(v, top);
         top = newNode;
+        toparr = top->valor;
     }
 }
- template <class T> void Pila<T>::pop() {
+ template <class T> T Pila<T>::pop() {
+     T tmp;
      if (top) {
-         if (*(top->valor)==0) {
+         if (toparr == top->valor) {
+             tmp = *toparr;
              Node<T>* aux = top;
              top = top->next;
+             toparr = top->valor;
              delete aux;
+             return tmp;
          }
          else {
-             for (T* tmp = top->valor+4; tmp != top->valor-1; tmp--) {
-                 if (*(tmp) != 0) {
-                     *(tmp) = 0;
-                     break;
-                 }
-             }
+             tmp = *toparr;
+             *toparr = 0;
+             toparr--;
+             return tmp;
          }
      }
  }
+ 
 
 int main() {
     Pila<int> P;
@@ -77,7 +78,7 @@ int main() {
     P.pop();
     P.pop();
     P.pop();
-    P.pop();
+
 
     P.imprimir();
 }
