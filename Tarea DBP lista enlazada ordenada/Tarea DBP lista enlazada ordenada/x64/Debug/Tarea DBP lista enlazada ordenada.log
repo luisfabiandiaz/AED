@@ -1,0 +1,15 @@
+﻿  Tarea DBP lista enlazada ordenada.cpp
+D:\UCSP\AED\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada.cpp(40,17): warning C4804: '<': uso no seguro del tipo 'bool' en la operación
+D:\UCSP\AED\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada.cpp(37,59): message : al compilar la función del miembro clase plantilla "bool Cola<int>::find(Node<T> *&,T)"
+          with
+          [
+              T=int
+          ]
+D:\UCSP\AED\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada.cpp(50,46): message : al compilar la función del miembro clase plantilla "void Cola<int>::insert(T)"
+          with
+          [
+              T=int
+          ]
+D:\UCSP\AED\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada.cpp(87,17): message : vea la primera referencia a “Cola<int>::insert” en “main”
+D:\UCSP\AED\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada\Tarea DBP lista enlazada ordenada.cpp(85,15): message : Vea la referencia a la creación de una instancia de clase plantilla "Cola<int>" que se está compilando
+  Tarea DBP lista enlazada ordenada.vcxproj -> D:\UCSP\AED\Tarea DBP lista enlazada ordenada\x64\Debug\Tarea DBP lista enlazada ordenada.exe
