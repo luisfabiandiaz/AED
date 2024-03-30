@@ -1,3 +1,5 @@
 ﻿  para hacer cosillas asi aleatorias.cpp
-D:\UCSP\AED\para hacer cosillas asi aleatorias\para hacer cosillas asi aleatorias\para hacer cosillas asi aleatorias.cpp(66): warning C4715: 'BinBus': no todas las rutas de acceso de control devuelven un valor
+D:\UCSP\AED\para hacer cosillas asi aleatorias\para hacer cosillas asi aleatorias\para hacer cosillas asi aleatorias.cpp(73,10): warning C4101: 'temp': variable local sin referencia
+D:\UCSP\AED\para hacer cosillas asi aleatorias\para hacer cosillas asi aleatorias\para hacer cosillas asi aleatorias.cpp(95,10): warning C4101: 'temp': variable local sin referencia
+D:\UCSP\AED\para hacer cosillas asi aleatorias\para hacer cosillas asi aleatorias\para hacer cosillas asi aleatorias.cpp(69): warning C4715: 'List::find': no todas las rutas de acceso de control devuelven un valor
   para hacer cosillas asi aleatorias.vcxproj -> D:\UCSP\AED\para hacer cosillas asi aleatorias\x64\Debug\para hacer cosillas asi aleatorias.exe

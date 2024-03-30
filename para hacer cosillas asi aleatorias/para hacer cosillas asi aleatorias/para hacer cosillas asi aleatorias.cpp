@@ -1,91 +1,193 @@
 #include <iostream>
 using namespace std;
-//ej 1
-class Pila {
+
+class Node {
 public:
-    int elem[10];
-    int* top = NULL;
-    bool Push(int a);
-    bool Pop(int& a);
-    Pila() {
-        for (int* p = elem; p < elem + 10; p++) {
+
+    int arr[5];
+    Node* next;
+
+    Node() {
+        for (int* p = arr; p != arr + 5; p++) {
             *p = 0;
         }
-    }
+    };
 };
-bool Pila::Push(int a) {
-    for (int* p = elem; p < elem + 10; p++) {
-        if (*p == 0) {
-            *p = a;
-            return 1;
-        }
+
+
+class List {
+public:
+    Node* init;
+    Node* END;
+    int* end;
+    List() {
+        init = new Node();
+        end = NULL;
+        END = init;
     }
-    return 0;
-}
-bool Pila::Pop(int& a) {
+    bool add(int n);
+    bool del(int n);
+    void av1(int* pos, Node* p, bool cm);
+    void av2(int* pos, Node* p);
+    bool find(int k, int*& pos, Node*& p);
+    void print();
+};
 
-    for (int* p = elem + 10; p > elem; p--) {
-        if (*p != 0) {
-            a = *p;
-            *p = 0;
-            return 1;
+bool List::find(int k, int*& pos, Node*& p) {
+    p = init;
+    for (; p;) {
+        if (k < *(p->arr + 5) || *(p->arr + 5)==0) {
+            for (int* q = p->arr; q != p->arr + 5; q++) {
+                if (*q == k) {
+                    pos = q;
+                    return 1;
+                }
+                if (*q > k) {
+                    pos = q;
+                    return 0;
+                }
+            }
         }
-    }
-    return 0;
-}
-//el pop regresa lo borrado y ordena la lista
-
-
-
-//ej 2
-//arr con n elemnetos ordenados de men a mayor
-///binbus encuentra la key y la devuelve en pos
-bool BinBus(int* ini, int* fin, int*& pos, int key) {
-    int* med = ini;
-    med += (fin - ini) / 2;
-    while (*ini <= *fin) {
-        if (*med < key) {
-            ini = med;
-            med += ((fin - ini) + 1) / 2 ;
-        }
-        else if (*med == key)
-        {
-            cout << "Se encontro la posicion" << "\n";
-            pos = med;
-            return 1;
+        if (p->next) {
+            p = p->next;
         }
         else {
-            fin = med;
-            med -= ((fin - ini) + 1) / 2;
+            break;
         }
-        if (*ini == *fin) {
-            cout << key << " no se encontro" << "\n";
+    }
+
+    if (k > *end) {
+        if (end == (p->arr + 4)) {
+            pos = NULL;
             return 0;
+        }
+        else {
+            pos = end + 1;
+            return 0;
+        }
+    }
+}
+void List::av1(int* pos, Node* POS, bool cm) {
+    int tmp = *pos;
+    *pos = 0;
+    bool temp;
+    for (int* q = pos + 1; q != POS->arr + 5; q++) {
+        int tmp2 = *q;
+        *q = tmp;
+        tmp = tmp2;
+    }
+    if (POS->next) {
+        for (Node* p = POS->next; p; p = p->next) {
+            for (int* q = p->arr; q != p->arr + 5; q++) {
+                int tmp2 = *q;
+                *q = tmp;
+                tmp = tmp2;
+            }
+        }
+    }
+    if (!cm) {
+        end = end + 1;
+    }
+}
+void List::av2(int* pos, Node* POS) {
+    int tmp;
+    *pos = 0;
+    bool temp;
+    for (int* q = pos ; q != POS->arr + 5; q++) {
+        tmp = *q;
+        *q = *(q + 1);
+        *(q + 1) = tmp;
+    }
+    if (POS->next) {
+        *(POS->arr + 4) = *(POS->next->arr);
+        *(POS->next->arr) = 0;
+    }
+    for (Node* p = POS->next; p; p = p->next) {
+        for (int* q = p->arr; q != p->arr + 5; q++) {
+            tmp = *q;
+            *q = *(q + 1);
+            *(q + 1) = tmp;
+        }
+        if (p->next) {
+        *(p->arr + 4) = *(p->next->arr);
+        *(p->next->arr) = 0;
+            }
+        }
+    
+}
+bool  List::del(int n) {
+    int* pos;
+    Node* POS;
+    bool cm = 0;
+    if (find(n, pos, POS)) {       
+        av2(pos, POS);
+        end = end - 1;
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+bool  List::add(int n) {
+    if (!end) {
+        end = init->arr;
+        *end = n;
+        return 1;
+    }
+    int* pos;
+    Node* POS;
+    bool cm = 0;
+    if (!find(n, pos, POS)) {
+        if (!pos) {
+            END->next = new Node();
+            END = END->next;
+            end = END->arr;
+            *end = n;
+            return 1;
+        }
+        else if (end == END->arr + 4) {
+            END->next = new Node();
+            END = END->next;
+            end = END->arr;
+            cm = 1;
+        }
+        av1(pos, POS, cm);
+        *pos = n;
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+void List::print() {
+    for (Node* p = init; p; p = p->next) {
+        for (int* q = p->arr; q != p->arr + 5; q++) {
+            cout << *q << "////";
         }
     }
 }
 
 int main()
 {
-    int arr[15] = { 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150 };
-    int* pos;
-    BinBus(arr, arr + 14, pos, 150);
-    cout << "pos: " << *pos;
+    List p;
+    p.add(5);
+    p.add(2);
+    p.add(1);
+    p.add(7);
+    p.add(8);
+    p.add(3);
+    p.add(10);
+    p.add(4);
+    p.add(9);
+    p.add(6);
+    p.add(11);
+    p.add(13);
+    p.add(12);
+    p.del(4);
+    p.del(1);
+    p.del(13);
 
 
-
-
-    int a = 0;
-    Pila q;
-    q.Push(10);
-    q.Push(11);
-    q.Push(12);
-    q.Push(13);
-    q.Push(14);
-    q.Pop(a);
-    q.Pop(a);
-    q.Pop(a);
-    q.Pop(a);
-    //cout <<"a: " << a;
+    p.print();
 }
-
