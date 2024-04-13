@@ -6,7 +6,7 @@ public:
 
     int arr[5];
     Node* next;
-
+    Node* prev;
     Node() {
         for (int* p = arr; p != arr + 5; p++) {
             *p = 0;
@@ -36,7 +36,7 @@ public:
 bool List::find(int k, int*& pos, Node*& p) {
     p = init;
     for (; p;) {
-        if (k < *(p->arr + 5) || *(p->arr + 5)==0) {
+        if (k < *(p->arr + 5) || *(p->arr + 5) == 0) {
             for (int* q = p->arr; q != p->arr + 5; q++) {
                 if (*q == k) {
                     pos = q;
@@ -93,7 +93,7 @@ void List::av2(int* pos, Node* POS) {
     int tmp;
     *pos = 0;
     bool temp;
-    for (int* q = pos ; q != POS->arr + 5; q++) {
+    for (int* q = pos; q != POS->arr + 5; q++) {
         tmp = *q;
         *q = *(q + 1);
         *(q + 1) = tmp;
@@ -109,19 +109,27 @@ void List::av2(int* pos, Node* POS) {
             *(q + 1) = tmp;
         }
         if (p->next) {
-        *(p->arr + 4) = *(p->next->arr);
-        *(p->next->arr) = 0;
-            }
+            *(p->arr + 4) = *(p->next->arr);
+            *(p->next->arr) = 0;
         }
-    
+    }
+
 }
 bool  List::del(int n) {
     int* pos;
     Node* POS;
     bool cm = 0;
-    if (find(n, pos, POS)) {       
+    if (find(n, pos, POS)) {
         av2(pos, POS);
-        end = end - 1;
+        if (end == END->arr) {
+            END = END->prev;
+            delete END->next;
+            END->next = NULL;
+            end = END->arr + 4;
+        }
+        else {
+            end = end - 1;
+        }
         return 1;
     }
     else {
@@ -141,6 +149,7 @@ bool  List::add(int n) {
     if (!find(n, pos, POS)) {
         if (!pos) {
             END->next = new Node();
+            END->next->prev = END;
             END = END->next;
             end = END->arr;
             *end = n;
@@ -148,6 +157,7 @@ bool  List::add(int n) {
         }
         else if (end == END->arr + 4) {
             END->next = new Node();
+            END->next->prev = END;
             END = END->next;
             end = END->arr;
             cm = 1;
@@ -162,10 +172,13 @@ bool  List::add(int n) {
 }
 void List::print() {
     for (Node* p = init; p; p = p->next) {
+        cout << "{";
         for (int* q = p->arr; q != p->arr + 5; q++) {
-            cout << *q << "////";
+            cout << *q << ",";
         }
+        cout << "} ->";
     }
+    cout << "\n";
 }
 
 int main()
@@ -184,9 +197,14 @@ int main()
     p.add(11);
     p.add(13);
     p.add(12);
+
+    p.print();
+
     p.del(4);
     p.del(1);
     p.del(13);
+    p.del(10);
+    p.del(7);
 
 
     p.print();

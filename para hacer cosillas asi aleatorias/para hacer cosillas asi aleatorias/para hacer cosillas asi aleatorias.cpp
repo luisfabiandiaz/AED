@@ -4,116 +4,208 @@ using namespace std;
 class Node {
 public:
 
-    int val;
+    int arr[5];
     Node* next;
     Node* prev;
-    Node(int va,Node* n, Node* p) {
-        val = va;
-        next = n;
-        prev = p;
-    }
+    Node() {
+        for (int* p = arr; p != arr + 5; p++) {
+            *p = 0;
+        }
+    };
 };
 
 
-class CDeque{
+class List {
 public:
-    Node* ini;
-    Node* end;
-    CDeque() {
-        ini = NULL;
+    Node* init;
+    Node* END;
+    int* end;
+    List() {
+        init = new Node();
         end = NULL;
+        END = init;
     }
-    void pushfront(int n);
-    void pushback(int n);
-    void popfront();
-    void popback();
+    bool add(int n);
+    bool del(int n);
+    void av1(int* pos, Node* p, bool cm);
+    void av2(int* pos, Node* p);
+    bool find(int k, int*& pos, Node*& p);
     void print();
-    int& operator[](int n);
 };
-void List::pushfront(int n) {
-    if (!ini) {
-        ini = new Node(n,NULL,NULL);
-        end = ini;
-    }
-    else {
-        end->next = new Node(n, NULL, end);
-        end = end->next;
-    }
-}
-void List::pushback(int n) {
-    if (!ini) {
-        ini = new Node(n, NULL, NULL);
-        end = ini;
-    }
-    else {
-        ini->prev = new Node(n, ini, NULL);
-        ini = ini->prev;
-    }
-}
-void List::popback() {
-    if (!ini) {
-        cout << "no hay elementos";
-    }
-    else if(!ini->next){
-        delete ini;
-        ini = NULL;
-        end = NULL;
-    }
-    else {
-        ini = ini->next;
-        delete ini->prev;
-        ini->prev = NULL;
-    }
-}
-void List::popfront() {
-    if (!ini) {
-        cout << "no hay elementos";
-    }
-    else if (!ini->next) {
-        delete ini;
-        ini = NULL;
-        end = NULL;
-    }
-    else {
-        end = end->prev;
-        delete end->next;
-        end->next = NULL;
-    }
-}
 
-void List::print() {
-    for (Node* p = ini;p;p=p->next) {
-        cout << p->val << "///";
-    }
-    cout <<"\n";
-}
-int& List::operator[](int n) {
-    Node* p = ini;
-    for (int i=0; i!=n; i++) {
-        if (!p) {
-            cout << "te pasaste";
+bool List::find(int k, int*& pos, Node*& p) {
+    p = init;
+    for (; p;) {
+        if (k < *(p->arr + 5) || *(p->arr + 5) == 0) {
+            for (int* q = p->arr; q != p->arr + 5; q++) {
+                if (*q == k) {
+                    pos = q;
+                    return 1;
+                }
+                if (*q > k) {
+                    pos = q;
+                    return 0;
+                }
+            }
+        }
+        if (p->next) {
+            p = p->next;
+        }
+        else {
             break;
         }
-         p = p->next;
     }
-    return p->val;
+
+    if (k > *end) {
+        if (end == (p->arr + 4)) {
+            pos = NULL;
+            return 0;
+        }
+        else {
+            pos = end + 1;
+            return 0;
+        }
+    }
 }
+void List::av1(int* pos, Node* POS, bool cm) {
+    int tmp = *pos;
+    *pos = 0;
+    bool temp;
+    for (int* q = pos + 1; q != POS->arr + 5; q++) {
+        int tmp2 = *q;
+        *q = tmp;
+        tmp = tmp2;
+    }
+    if (POS->next) {
+        for (Node* p = POS->next; p; p = p->next) {
+            for (int* q = p->arr; q != p->arr + 5; q++) {
+                int tmp2 = *q;
+                *q = tmp;
+                tmp = tmp2;
+            }
+        }
+    }
+    if (!cm) {
+        end = end + 1;
+    }
+}
+void List::av2(int* pos, Node* POS) {
+    int tmp;
+    *pos = 0;
+    bool temp;
+    for (int* q = pos; q != POS->arr + 5; q++) {
+        tmp = *q;
+        *q = *(q + 1);
+        *(q + 1) = tmp;
+    }
+    if (POS->next) {
+        *(POS->arr + 4) = *(POS->next->arr);
+        *(POS->next->arr) = 0;
+    }
+    for (Node* p = POS->next; p; p = p->next) {
+        for (int* q = p->arr; q != p->arr + 5; q++) {
+            tmp = *q;
+            *q = *(q + 1);
+            *(q + 1) = tmp;
+        }
+        if (p->next) {
+            *(p->arr + 4) = *(p->next->arr);
+            *(p->next->arr) = 0;
+        }
+    }
+
+}
+bool  List::del(int n) {
+    int* pos;
+    Node* POS;
+    bool cm = 0;
+    if (find(n, pos, POS)) {
+        av2(pos, POS);
+        if (end == END->arr) {
+            END = END->prev;
+            delete END->next;
+            END->next = NULL;
+            end = END->arr + 4;
+        }
+        else {
+            end = end - 1;
+        }
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+bool  List::add(int n) {
+    if (!end) {
+        end = init->arr;
+        *end = n;
+        return 1;
+    }
+    int* pos;
+    Node* POS;
+    bool cm = 0;
+    if (!find(n, pos, POS)) {
+        if (!pos) {
+            END->next = new Node();
+            END->next->prev = END;
+            END = END->next;
+            end = END->arr;
+            *end = n;
+            return 1;
+        }
+        else if (end == END->arr + 4) {
+            END->next = new Node();
+            END->next->prev = END;
+            END = END->next;
+            end = END->arr;
+            cm = 1;
+        }
+        av1(pos, POS, cm);
+        *pos = n;
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+void List::print() {
+    for (Node* p = init; p; p = p->next) {
+        cout << "{";
+        for (int* q = p->arr; q != p->arr + 5; q++) {
+            cout << *q << ",";
+        }
+        cout << "} ->";
+    }
+    cout << "\n";
+}
+
 int main()
 {
     List p;
-    p.pushfront(3);
-    p.pushback(12);
-    p.pushfront(7);
-    p.pushfront(32);
-    p.pushfront(2);
-    p.pushfront(13);
-    p.pushfront(26);
-    p.pushfront(4);
-    p.popfront();
-    p.popback();
+    p.add(5);
+    p.add(2);
+    p.add(1);
+    p.add(7);
+    p.add(8);
+    p.add(3);
+    p.add(10);
+    p.add(4);
+    p.add(9);
+    p.add(6);
+    p.add(11);
+    p.add(13);
+    p.add(12);
+
     p.print();
-    p[3] = 5;
-    int x = p[2];
+
+    p.del(4);
+    p.del(1);
+    p.del(13);
+    p.del(10);
+    p.del(7);
+
+
     p.print();
-    cout << x;
 }
