@@ -1,0 +1,4 @@
+﻿  Source.cpp
+D:\UCSP\AED\tarea 3 vs sfml\tarea 3 vs sfml\Source.cpp(107,51): warning C4244: 'argumento': conversión de 'int' a 'float'; posible pérdida de datos
+D:\UCSP\AED\tarea 3 vs sfml\tarea 3 vs sfml\Source.cpp(107,40): warning C4244: 'argumento': conversión de 'int' a 'float'; posible pérdida de datos
+  tarea 3 vs sfml.vcxproj -> D:\UCSP\AED\tarea 3 vs sfml\x64\Debug\tarea 3 vs sfml.exe
