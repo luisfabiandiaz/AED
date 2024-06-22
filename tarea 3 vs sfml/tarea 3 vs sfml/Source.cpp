@@ -1,161 +1,267 @@
-#include <SFML/Graphics.hpp>
 #include <iostream>
-#include <queue>
+#include <SFML/Graphics.hpp>
 #include <vector>
-int tamx=1000;
-int aumx = 0;
-sf::RenderWindow window(sf::VideoMode(1500, 1000), "SFML works!");
-struct CBinTreeNode
-{
-    CBinTreeNode(int v)
-    {
-        value = v;
-        nodes[0] = nodes[1] = 0;
-    }
-    sf::RectangleShape figura;
-    sf::Text texto;
-    CBinTreeNode* nodes[2];
-    int value;
-};
+#include <queue>
+using namespace std;
 
-class CBinTree
-{
+class Node {
 public:
-    CBinTree();
-    void Print();
-    int size=0;
-    int sizemapx=1000;
-    int sizemapy = 1000;
-    bool Insert(int x);
-    bool Remove(int x);
-private:
-    bool Find(int x, CBinTreeNode**& p);
-    CBinTreeNode** Rep(CBinTreeNode** p);
-    void InOrder(CBinTreeNode* n);
-    void InOrderc(CBinTreeNode* n);
-    void Levels(CBinTreeNode* n);
-    CBinTreeNode* root;
+	int val;
+	int alt;
+	Node* right;
+	Node* left;
+	Node* padre;
+	Node(int n, Node* r, Node* l, Node* p) {
+		alt = 1;
+		val = n;
+		right = r;
+		left = l;
+		padre = p;
+	}
 };
 
-CBinTree::CBinTree()
-{
-    root = 0;
+class AVLtree {
+public:
+	int tam;
+	Node* root = NULL;
+	bool Insert(int x);
+	bool Delete(int x);
+	bool Find(Node**& x, Node*& P, int y);
+	void Print(Node* root);
+	void Valanceo(Node* x);
+	void Inorder(Node* x, vector<int>& arrIn);
+	void Levels(Node* n, vector<int>& levels);
+	void Posorder(Node* x, vector<int>& arrPos);
+};
+void AVLtree::Inorder(Node* x, vector<int>& arrIn) {
+	if (!x) return;
+	Inorder(x->left, arrIn);
+	arrIn.push_back((x)->val);
+	Inorder(x->right, arrIn);
+}
+void AVLtree::Levels(Node* n, vector<int>& levels) {
+	{
+		if (!n) return;
+		queue<Node*> q;
+		q.push({ n });
+		while (!q.empty())
+		{
+			Node* pp = q.front();
+			Node* nn = pp;
+			if (nn->left) {
+				q.push({ nn->left });
+			}
+			if (nn->right) {
+				q.push({ nn->right});
+			}
+			levels.push_back(nn->val);
+			q.pop();
+		}
+	}
+}
+void AVLtree::Posorder(Node* x, vector<int>& arrPos) {
+	if (!x) return;
+	arrPos.push_back((x)->val);
+	Posorder(x->left, arrPos);
+	Posorder(x->right, arrPos);
+}
+void AVLtree::Print(Node* root) {
+	vector<int> arrIn;
+	vector<int> levels;
+	Inorder(root, arrIn);
+	Levels(root, levels);
+	for (auto i = levels.begin(); i != levels.end();) {
+		for (auto i2 = arrIn.begin(); i2 != arrIn.end(); ++i2) {
+			if (i != levels.end()) {
+				if (*i == *i2) {
+					cout << *i2;
+					++i;
+				}
+				else {
+					cout << "   ";
+				}
+			}
+		}
+		cout << "\n";
+	}
+}
+bool AVLtree::Find(Node**& x, Node*& P, int y) {
+	x = &root;
+	while ((*x)) {
+		if (y > (*x)->val) {
+			P = *x;
+			x = &(*x)->right;
+		}
+		else if (y < (*x)->val) {
+			P = *x;
+			x = &(*x)->left;
+		}
+		else {
+			return 1;
+		}
+	}
+	return 0;
+}
+void AVLtree::Valanceo(Node* x) {
+	while (x) {
+		if (x->padre) {
+			if (x->padre->alt <= x->alt) {
+				x->padre->alt = x->alt + 1;
+			}
+		}
+		int le = (x->left == nullptr ? 0 : x->left->alt);
+		int ri = (x->right == nullptr ? 0 : x->right->alt);
+		if (ri - le == 2) {
+			le = (x->right->left == nullptr ? 0 : x->right->left->alt);
+			ri = (x->right->right == nullptr ? 0 : x->right->right->alt);
+			if (ri - le == 1) {//caso 1
+				x->alt = x->alt - 2;
+				x->right->padre = x->padre;
+				if (x == root) {
+					root = x->right;
+				}
+				else {
+					if (x->padre->right == x) {
+						x->padre->right = x->right;
+					}
+					else {
+						x->padre->left = x->right;
+					}
+				}
+				if (x->right->left) {
+					x->right->left->padre = x;
+				}
+				Node* tmp = x->right->left;
+				x->right->left = x;
+				x->padre = x->right;
+				x->right = tmp;
+
+			}
+			else if (ri - le == -1) {//caso 4
+				x->alt = x->alt - 2;
+				x->right->alt = x->right->alt - 1;
+				x->right->left->alt = x->right->alt + 1;
+				Node* tmpl = x->right->left->right;
+				Node* tmpr = x->right->left->left;
+				x->right->left->padre = x->padre;
+				if (x == root) {
+					root = x->right->left;
+				}
+				else {
+					if (x->padre->left == x) {
+						x->padre->left = x->right->left;
+					}
+					else {
+						x->padre->right = x->right->left;
+					}
+				}
+				x->padre = x->right->left;
+				x->padre->left = x;
+				x->padre->right = x->right;
+				x->padre->right->padre = x->padre;
+				if (tmpl) {
+					tmpl->padre = x->padre->right;
+					tmpl->padre->left = tmpl;
+				}
+				if (tmpr) {
+					tmpr->padre = x;
+					tmpr->padre->right = tmpr;
+				}
+			}
+		}
+		if (ri - le == -2) {
+			le = (x->left->left == nullptr ? 0 : x->left->left->alt);
+			ri = (x->left->right == nullptr ? 0 : x->left->right->alt);
+			if (ri - le == 1) {//caso 3
+				x->alt = x->alt - 2;
+				x->left->alt = x->left->alt - 1;
+				x->left->right->alt = x->left->alt + 1;
+				Node* tmpl = x->left->right->left;
+				Node* tmpr = x->left->right->right;
+				x->left->right->padre = x->padre;
+				if (x == root) {
+					root = x->left->right;
+				}
+				else {
+					if (x->padre->right == x) {
+						x->padre->right = x->left->right;
+					}
+					else {
+						x->padre->left = x->left->right;
+					}
+				}
+				x->padre = x->left->right;
+				x->padre->right = x;
+				x->padre->left = x->left;
+				x->padre->left->padre = x->padre;
+				if (tmpl) {
+					tmpl->padre = x->padre->left;
+					tmpl->padre->right = tmpl;
+				}
+				if (tmpr) {
+					tmpr->padre = x;
+					tmpr->padre->left = tmpr;
+				}
+			}
+			else if (ri - le == -1) {//caso2
+				x->alt = x->alt - 2;
+				x->left->padre = x->padre;
+				if (x == root) {
+					root = x->left;
+				}
+				else {
+					if (x->padre->left == x) {
+						x->padre->left = x->left;
+					}
+					else {
+						x->padre->right = x->left;
+					}
+				}
+				if (x->left->right) {
+					x->left->right->padre = x;
+				}
+				Node* tmp = x->left->right;
+				x->left->right = x;
+				x->padre = x->left;
+				x->left = tmp;
+			}
+		}
+		x = x->padre;
+	}
+
+
+}
+bool AVLtree::Insert(int x) {
+	if (!root) {
+		root = new Node(x, NULL, NULL, NULL);
+	}
+	else {
+		Node** tmp;
+		Node* P;
+		if (Find(tmp, P, x)) {
+			return 0;
+		}
+		else {
+			(*tmp) = new Node(x, NULL, NULL, P);
+			Valanceo(*tmp);
+			return 1;
+		}
+	}
 }
 
-bool CBinTree::Find(int x, CBinTreeNode**& p)
-{
-    for (p = &root; *p && (*p)->value != x;
-        p = &((*p)->nodes[x > (*p)->value]));
-    return *p != 0;
-}
+int main() {
+	AVLtree uwu;
+	uwu.Insert(800);
+	uwu.Insert(700);
+	uwu.Insert(600);
+	uwu.Insert(500);
+	uwu.Insert(400);
+	uwu.Insert(300);
+	uwu.Insert(200);
+	uwu.Insert(100);
 
-bool CBinTree::Insert(int x)
-{
-    CBinTreeNode** p;
-    if (Find(x, p)) return 0;
-    *p = new CBinTreeNode(x);
-    size = size + 1;
-    return 1;
-}
 
-void CBinTree::InOrder(CBinTreeNode* n)
-{
-    if (!n) return;
-    InOrder(n->nodes[0]);
-    std::cout << n->value << " ";
-    InOrder(n->nodes[1]);
-}
+	//uwu.Print(uwu.root);
 
-void CBinTree::InOrderc(CBinTreeNode* n)
-{
-    if (!n) return;
-    InOrderc(n->nodes[0]);
-
-    window.draw(n->figura);
-    window.draw(n->texto);
-
-    InOrderc(n->nodes[1]);
-}
-
-void CBinTree::Levels(CBinTreeNode* n)
-{
-    if (!n) return;
-    std::queue<std::pair<CBinTreeNode*, int>> q;
-    q.push({ n,0 });
-    int l = 0;
-    while (!q.empty())
-    {
-        int last = l;
-        std::pair<CBinTreeNode*, int> pp = q.front();
-        CBinTreeNode* nn = pp.first;
-        l = pp.second;
-        if (nn->nodes[0]) {
-            q.push({ nn->nodes[0],l + 1 });
-        }
-        if (nn->nodes[1]) {
-            q.push({ nn->nodes[1],l + 1 });
-        }
-        if (last != l) { 
-            std::cout << "\n"; 
-            tamx = tamx / 2;
-            sizemapx = tamx;
-            sizemapy = sizemapy + 50;
-            aumx = sizemapx*2;
-        }
-        nn->figura.setFillColor(sf::Color::Red);
-        nn->figura.setSize(sf::Vector2f(30, 30));
-        nn->figura.setPosition(sizemapx/2,sizemapy-990);
-        sizemapx += aumx;
-        std::cout << nn->value << "(" << l << ") ";
-        q.pop();
-    }
-
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-        InOrderc(n);
-        window.display();
-    }
-
-}
-
-void CBinTree::Print()
-{
-    Levels(root);
-    std::cout << "\n";
-}
-
-void VecInsert(CBinTree* t, int* v, int size)
-{
-    if (size == 1) {
-        t->Insert(*v);
-    }
-    else if (size == 0) {
-        return;
-    }
-    else {
-        if (size % 2 == 0) {
-            t->Insert(*(v + (size / 2)));
-            VecInsert(t, (v + (size / 2) + 1), (size / 2) - 1);
-            VecInsert(t, v, size / 2);
-        }
-        else {
-            t->Insert(*(v + (size / 2)));
-            VecInsert(t, (v + (size / 2) + 1), size / 2);
-            VecInsert(t, v, size / 2);
-        }
-    }
-}
-
-int main()
-{
-    CBinTree t;
-    int v[] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
-    VecInsert(&t, v, 16);
-    t.Print();
+	uwu.Print(uwu.root);
 }
